@@ -20,7 +20,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'cpf',
+        'cep',
+        'address',
+        'nationality',
+        'cpf_status',
         'password',
+    ];
+
+    protected $casts = [
+        'address' => 'array',
+        'nationality' => 'array',
+        'cpf_status' => 'array',
     ];
 
     /**
