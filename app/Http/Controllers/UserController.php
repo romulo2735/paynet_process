@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\UserProcessDTO;
 use App\Http\Requests\ProcessRequest;
+use App\Http\Resources\UserResource;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,10 @@ class UserController extends Controller
     {
     }
 
+    /**
+     * @param ProcessRequest $processRequest
+     * @return JsonResponse
+     */
     public function process(ProcessRequest $processRequest): JsonResponse
     {
         $dto = new UserProcessDTO($processRequest->validated());
@@ -26,7 +31,11 @@ class UserController extends Controller
         ], 202);
     }
 
-    public function show(string $cpf): JsonResponse
+    /**
+     * @param string $cpf
+     * @return UserResource|JsonResponse
+     */
+    public function show(string $cpf): UserResource|JsonResponse
     {
         $cacheKey = "process-user-{$cpf}";
 
@@ -42,9 +51,6 @@ class UserController extends Controller
             Cache::tags(['users', "cpf:$cpf"])->put($cacheKey, $user->toArray(), now()->addDay());
         }
 
-        return response()->json([
-            'status' => 'ok',
-            'data' => $user
-        ]);
+        return UserResource::make($user)->additional(['status' => 'ok']);
     }
 }
