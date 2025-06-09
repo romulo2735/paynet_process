@@ -9,7 +9,19 @@ use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="Paynet Process API",
+ *     description="API para processamento, validação e enriquecimento de dados cadastrais",
+ *     @OA\Contact(
+ *         name="Suporte",
+ *         email="suporte@paynet.com"
+ *     )
+ * )
+ */
 class UserController extends Controller
 {
     public function __construct(private readonly UserService $userService)
@@ -17,8 +29,38 @@ class UserController extends Controller
     }
 
     /**
-     * @param ProcessRequest $processRequest
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/api/v1/users/process",
+     *     summary="Processa e enfileira os dados do usuário",
+     *     description="Valida os dados e inicia o processamento assíncrono via fila. Dados são enriquecidos via múltiplas APIs externas.",
+     *     operationId="processUser",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"cpf", "cep", "email"},
+     *             @OA\Property(property="cpf", type="string", example="12345678900"),
+     *             @OA\Property(property="cep", type="string", example="06454000"),
+     *             @OA\Property(property="email", type="string", example="usuario@example.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=202,
+     *         description="Usuário enviado para processamento",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User in processing"),
+     *             @OA\Property(property="status", type="string", example="queue")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function process(ProcessRequest $processRequest): JsonResponse
     {
@@ -32,8 +74,35 @@ class UserController extends Controller
     }
 
     /**
-     * @param string $cpf
-     * @return UserResource|JsonResponse
+     * @OA\Get(
+     *     path="/api/v1/users/{cpf}",
+     *     summary="Busca dados processados de um usuário",
+     *     description="Retorna os dados do usuário a partir do cache (Redis) ou do banco de dados, se necessário.",
+     *     operationId="getUserByCpf",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="cpf",
+     *         in="path",
+     *         description="CPF do usuário a ser consultado",
+     *         required=true,
+     *         @OA\Schema(type="string", example="12345678900")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dados do usuário",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="status", type="string", example="ok")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Usuário não encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User not found")
+     *         )
+     *     )
+     * )
      */
     public function show(string $cpf): UserResource|JsonResponse
     {
