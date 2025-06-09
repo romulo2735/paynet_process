@@ -27,7 +27,7 @@ class ViaCepIntegration
                 throw new \Exception('Error searching for zip code');
             }
 
-            Log::info("$this->LOG_CONTEXT - ViaCep call completed successfully");
+            Log::info("$this->LOG_CONTEXT - ViaCep call completed successfully", ['response' => $response->json()]);
 
             return $response->json();
         }, 1000);
