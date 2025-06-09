@@ -23,8 +23,8 @@ class ProcessRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cpf' => 'required|regex:/^[0-9]{3}\.[0-9]{3}\.[0-9]{3}\-[0-9]{2}$/',
-            'cep' => 'required|regex:/^[0-9]{5}\-[0-9]{3}$/',
+            'cpf' => 'required|regex:/^[0-9]{11}$/',
+            'cep' => 'required|regex:/^[0-9]{8}$/',
             'email' => 'required|email',
         ];
     }
