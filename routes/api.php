@@ -11,7 +11,7 @@ Route::prefix('/v1/users')->group(function () {
 });
 
 // Mock API, to return a random status from cpf statuses //
-Route::get('/cpf/status/{cpf}', function (string $cpf) {
+Route::get('mock/cpf/status/{cpf}', function (string $cpf) {
     $statuses = ['clean', 'pending', 'negative'];
     return response()->json([
         'status' => $statuses[array_rand($statuses)]
