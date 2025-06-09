@@ -1,0 +1,159 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Paynet Process API",
+        "description": "API para processamento, validação e enriquecimento de dados cadastrais",
+        "contact": {
+            "name": "Suporte",
+            "email": "suporte@paynet.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/users/process": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Processa e enfileira os dados do usuário",
+                "description": "Valida os dados e inicia o processamento assíncrono via fila. Dados são enriquecidos via múltiplas APIs externas.",
+                "operationId": "processUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cpf",
+                                    "cep",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "cpf": {
+                                        "type": "string",
+                                        "example": "12345678900"
+                                    },
+                                    "cep": {
+                                        "type": "string",
+                                        "example": "06454000"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "usuario@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Usuário enviado para processamento",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User in processing"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "queue"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{cpf}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Busca dados processados de um usuário",
+                "description": "Retorna os dados do usuário a partir do cache (Redis) ou do banco de dados, se necessário.",
+                "operationId": "getUserByCpf",
+                "parameters": [
+                    {
+                        "name": "cpf",
+                        "in": "path",
+                        "description": "CPF do usuário a ser consultado",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "12345678900"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Users"
+        }
+    ]
+}
