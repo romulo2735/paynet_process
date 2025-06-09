@@ -8,7 +8,6 @@ use App\Integrations\NationalizeIntegration;
 use App\Integrations\ViaCepIntegration;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class UserEnrichmentService
@@ -24,6 +23,8 @@ class UserEnrichmentService
 
     public function process(UserProcessDTO $dto): string
     {
+        Log::info("[USER_ERNICHMENT_SERVICE] - Starting user enrichment", ['$dto' => $dto]);
+
         $cacheKey = "process-user-{$dto->cpf}";
 
         if (Cache::tags(['users', "cpf:{$cacheKey}"])->has($cacheKey)) {
@@ -32,28 +33,21 @@ class UserEnrichmentService
         }
 
         try {
-            $promises = Http::pool(fn($pool) => [
-                'cep' => $pool->get($this->viaCepClient->checkAddress($dto->cep)),
-                'name' => $pool->get($this->nationalizeClient->checkName($dto->email)),
-                'status' => $pool->get($this->cpfStatusClient->checkCpf($dto->cpf)),
-            ]);
+            $addressIntegration = $this->viaCepClient->checkAddress($dto->cep);
+            $nationalityIntegration = $this->nationalizeClient->checkName($dto->email);
+            $cpfStatusIntegration = $this->cpfStatusClient->checkCpf($dto->cpf);
 
-            if (
-                $promises['cep']->failed() ||
-                $promises['name']->failed() ||
-                $promises['status']->failed()
-            ) {
+            if (!$addressIntegration || !$nationalityIntegration) {
                 throw new \Exception('Some external API failed');
             }
-
 
             $data = [
                 'cpf' => $dto->cpf,
                 'email' => $dto->email,
                 'cep' => $dto->cep,
-                'address' => $promises['cep']->json(),
-                'nationality' => $promises['name']->json(),
-                'cpf_status' => $promises['status']->json(),
+                'address' => $addressIntegration,
+                'nationality' => $nationalityIntegration,
+                'cpf_status' => "aproved",
             ];
 
             $user = $this->userRepository->storeOrUpdate($data);
