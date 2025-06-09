@@ -16,3 +16,10 @@ RUN mkdir -p /var/log/supervisor
 COPY docker/php/supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 
 WORKDIR /var/www
+
+RUN mkdir -p /var/www/storage/framework/{views,sessions,cache} \
+ && mkdir -p /var/www/storage/logs \
+ && mkdir -p /var/www/bootstrap/cache
+
+RUN chown -R www-data:www-data /var/www \
+ && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
