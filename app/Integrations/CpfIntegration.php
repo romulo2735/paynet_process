@@ -20,7 +20,7 @@ class CpfIntegration
         Log::info("$this->LOG_CONTEXT - Starting call to cpf", ['$cpf' => $cpf]);
 
         return retry(3, function () use ($cpf) {
-            $response = Http::get("http://localhost:8001/api/cpf/status", ['cpf' => $cpf]);
+            $response = Http::get("http://localhost:8080/api/mock/cpf/status/{$cpf}");
 
             if ($response->failed()) {
                 Log::error("$this->LOG_CONTEXT - error call to cpf", ['status' => $response->status()]);
@@ -28,7 +28,7 @@ class CpfIntegration
             }
 
             Log::info("$this->LOG_CONTEXT - completed successfully");
-            
+
             return $response->json();
         }, 1000);
     }
