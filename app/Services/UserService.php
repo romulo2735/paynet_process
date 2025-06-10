@@ -16,11 +16,10 @@ class UserService
         Log::info("Verifying if CPF is in cache: $cacheKey");
 
         if (!Redis::exists($cacheKey)) {
+            Log::info("CPF is not in cache:");
             Redis::setex($cacheKey, 300, json_encode($dto));
 
             ProcessUserJob::dispatch($dto);
         }
-
-        Log::info("CPF in cache:");
     }
 }
