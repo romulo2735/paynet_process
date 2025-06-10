@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('cpf');
             $table->string('cep');
+            $table->string('risk')->nullable();
             $table->json('address')->nullable();
             $table->json('nationality')->nullable();
             $table->json('cpf_status')->nullable();
