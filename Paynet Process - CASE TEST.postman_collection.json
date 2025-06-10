@@ -1,0 +1,502 @@
+{
+	"info": {
+		"_postman_id": "54d85725-aee9-4162-bfc2-e1053cac396e",
+		"name": "Paynet Process - CASE TEST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4144026"
+	},
+	"item": [
+		{
+			"name": "Entrada para o processo",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Function to generate a random CPF in the format xxx.xxx.xxx-xx\r",
+							"function generateRandomCPF() {\r",
+							"    const randomDigits = () => Math.floor(Math.random() * 10);\r",
+							"    const cpfArray = Array.from({ length: 9 }, randomDigits);\r",
+							"    const formattedCPF = `${cpfArray.slice(0, 3).join('')}${cpfArray.slice(3, 6).join('')}${cpfArray.slice(6, 9).join('')}${cpfArray.slice(0, 2).join('')}`;\r",
+							"    console.log(formattedCPF);\r",
+							"    return formattedCPF;\r",
+							"}\r",
+							"\r",
+							"// Generate and set the random CPF to an environment variable\r",
+							"pm.environment.set(\"random_cpf\", generateRandomCPF());\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cpf\" : \"{{random_cpf}}\",\r\n    \"cep\": \"60743245\",\r\n    \"email\": \"{{$randomEmail}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"process"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cpf\" : \"037.510.913-78\",\r\n    \"cep\": \"60743-245\",\r\n    \"email\": \"jonh@email.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/process",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"process"
+							]
+						}
+					},
+					"status": "Accepted",
+					"code": 202,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "nginx/1.27.5"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "PHP/8.3.22"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, private"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 09 Jun 2025 13:27:24 GMT"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"User in processing\",\n    \"status\": \"queue\"\n}"
+				},
+				{
+					"name": "422",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cpf\" : \"337.932.880\",\r\n    \"cep\": \"60743-245\",\r\n    \"email\": \"jonh@email.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/process",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"process"
+							]
+						}
+					},
+					"status": "Unprocessable Content",
+					"code": 422,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "nginx/1.27.5"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "PHP/8.3.22"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, private"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 09 Jun 2025 13:28:02 GMT"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"The cpf field format is invalid.\",\n    \"errors\": {\n        \"cpf\": [\n            \"The cpf field format is invalid.\"\n        ],\n        \"cep\": [\n            \"The cep field format is invalid.\"\n        ],\n        \"email\": [\n            \"The email field must be a valid email address.\"\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Lista um usuário em especifico",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/38272508338",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"38272508338"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mock de status do CPF",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/mock/cpf/status/03751098745",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"mock",
+						"cpf",
+						"status",
+						"03751098745"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - clean",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cpf/status/03587496589",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cpf",
+								"status",
+								"03587496589"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "nginx/1.27.5"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "PHP/8.3.22"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, private"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 08 Jun 2025 23:39:10 GMT"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "XSRF-TOKEN=eyJpdiI6ImZtRGNKeCs5TVcybWFQZDdweDdPb0E9PSIsInZhbHVlIjoiQlM1VlE1NU9RNEdYYnJiUk80NXhOVys0SDREbGhSYU1tU0ZJWjRUQnhiNTFRYUhGTG5DbU1tRGtyWDBoZGk3T0tyNFdxUFlJSTRDclQyQ2Q0cytNaXNrV0JoWFdKUmYrWUpVWnBiZmN5aDhrcE5TcHF0MyszNm1oUCsvZS9vTkYiLCJtYWMiOiI5ZDgwZjJmNmU5OWI4NGQ2ODdjYjJjMmRiM2Y3ZmRjMjU5N2MxMzA3Yjk5MDQ2YmE3NGFhZmYzYjhhNDRiOGFlIiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:39:10 GMT; Max-Age=7200; path=/; samesite=lax"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "paynet_process_session=eyJpdiI6IndmODVHUGNJUmMzTkh4Nk9oTDRZSmc9PSIsInZhbHVlIjoiOUViYW4rZGtqZnc3UWtKN2dTeGloSjJBWlU4NzJpTGJvZTQyMUFibkI3Y25QSEJSemx0WTZHOWNuQ2VVQmlPTWpVdzJiYzM5TitvZHlaTGJ1Q09kMHRySnFoUVhtdkRuYVVKVXRUQmxTZU1URlRJd2NNQjVOc2NmVHNyOTR2b2UiLCJtYWMiOiIwZWY4MjM0YjgyZmU2ZmE5MmY5ZDQ3MDU0NTA4MzJhOGRkYzgyNjkyYTA2N2M0ZWZkMjg5MTM1MDAzMTEzMzA2IiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:39:10 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"clean\"\n}"
+				},
+				{
+					"name": "200 - pending",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cpf/status/03587496589",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cpf",
+								"status",
+								"03587496589"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "nginx/1.27.5"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "PHP/8.3.22"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, private"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 08 Jun 2025 23:39:49 GMT"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "XSRF-TOKEN=eyJpdiI6IkxjbnVRQnh1NXIyaGQ5eUVvZDFSRUE9PSIsInZhbHVlIjoiM1dIQmxhWVpZbG9GNEtTTEluK0h2YTl2YVVuK3VrZWQ2eE9MY3VyaU9TNmxUVVlrZ1dROXJETWQzQllHTWhNN3BzYWR3Zm03cGNJUnZYV0NzRXNSYVVJL2IzN3BXVGJzdERCaEJJOVlBcTBtcU5rVzRxdFBydHVHTXpXTVJjcnQiLCJtYWMiOiJhZTFmMjg5NTM4NzFiMDhmNzM3MjRiOGNlYTFlYzFlMjUyZDk2OTU1NTZkMDE0ZjE3YWI0NTVjOWJkZWI4ZTUyIiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:39:49 GMT; Max-Age=7200; path=/; samesite=lax"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "paynet_process_session=eyJpdiI6ImJkcElhWXI5THdCNmRXRkx3R3owZ1E9PSIsInZhbHVlIjoiMHp4ZFpxRE41elJkbGphdzNQS0VpK1NQeXJabVd5TGdZazNsVFZFNVBvNzJNeWZUd280MUJnU2pPUmRrMkp4Q05IM2N3Z1hoalZtdDFhL3ZreFJRUkllc3ZEOGVQOFJZc0IzVWtOTVpoMWVZTmFWTFBSMzdkZnF6Y3hmZ3hPcEYiLCJtYWMiOiI1MTk5ZmQ1MWI5MmQ0ODhhZTU3ZGQyNDE3MGY3ODYwM2QwMzcwZjM5NDZkMWQ1NjljMTBhODlhZDg0YTI2NjE2IiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:39:49 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"pending\"\n}"
+				},
+				{
+					"name": "200 - negative",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cpf/status/03587496589",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cpf",
+								"status",
+								"03587496589"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "nginx/1.27.5"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "PHP/8.3.22"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, private"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 08 Jun 2025 23:40:11 GMT"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "XSRF-TOKEN=eyJpdiI6ImRId3NQUVRUczZEcGVYRDFVTUNsbHc9PSIsInZhbHVlIjoiYy90QUZnRzZvSkh5d3ovMXNyWURiN2lMR1dIMDBIZmlLSndCLzU5aDBLTzhHTDdqRUV6VDlUZzc2SXIzVVJMYTVyODVDVUFud1VKOGZnTUF4UHZzRkxYOWVlN2h5RGdWREVGZ2lGRENleFluT2p3ME9vYXUxSVZtK0xYWjJ1OEQiLCJtYWMiOiJmZWEzYTM2YTE0NjBiMmU0YWNiN2M2YTI0MWVhYTc0Njk3ODUwMGU4NTYzZjJhN2Q0ZDAzYTMyZjRiOThhNzcyIiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:40:11 GMT; Max-Age=7200; path=/; samesite=lax"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "paynet_process_session=eyJpdiI6Ii9PcXQvcDE5N2RaWjIyOUJDWHBQL3c9PSIsInZhbHVlIjoiSGppWDhRNXkvSU0xamlyZEd5bmp1d2tjNS9kR2MyRHJIL1VnVXdpQkU1MHpPNVFDZjI5OVN5UXVEYkdkMHVHaHJ6Ynl5N25adU5iOXdMOWxESFdNKzdjSVRFOFFkbmhseHBGNjBaMjE1Z0dPS3BhZkJMVnprYmFTMUxsUGVncDYiLCJtYWMiOiJmYTI2NWUwNGUwZWQxYjZhNGNhYzkyMGEwMDY3NTRmYjlmZWM0Y2FkNTU1NjY0OTJmN2RlZmUzODNlNDYzMGRiIiwidGFnIjoiIn0%3D; expires=Mon, 09 Jun 2025 01:40:11 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"negative\"\n}"
+				}
+			]
+		}
+	]
+}
