@@ -126,6 +126,10 @@ Ou gere via:
 ```bash
 php artisan l5-swagger:generate
 ```
+
+## Postman
+
+[Paynet Process - CASE TEST.postman_collection.json](Paynet%20Process%20-%20CASE%20TEST.postman_collection.json)
 ___
 
 ## 📁 Estrutura de Pastas
