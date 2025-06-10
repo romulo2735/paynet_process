@@ -17,19 +17,40 @@ class ViaCepIntegration
      */
     public function checkAddress(string $cep): ?array
     {
-        Log::info("$this->LOG_CONTEXT - Starting call to ViaCep", ['cep' => $cep]);
+        $context = "$this->LOG_CONTEXT - ViaCepIntegration";
 
-        return retry(3, function () use ($cep) {
-            $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
+        Log::info("$context - Starting call", ['cep' => $cep]);
 
-            if ($response->failed()) {
-                Log::error("$this->LOG_CONTEXT -  call failure", ['cep' => $cep, 'status' => $response->status()]);
-                throw new \Exception('Error searching for zip code');
-            }
+        try {
+            $result = retry(3, function () use ($cep, $context) {
+                Log::info("$context - Attempting HTTP request", ['cep' => $cep]);
 
-            Log::info("$this->LOG_CONTEXT - ViaCep call completed successfully", ['response' => $response->json()]);
+                $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
 
-            return $response->json();
-        }, 1000);
+                if ($response->failed()) {
+                    Log::error("$context - HTTP request failed", [
+                        'cep' => $cep,
+                        'status' => $response->status(),
+                        'body' => $response->body()
+                    ]);
+                    throw new \Exception('Error searching for zip code');
+                }
+
+                Log::info("$context - HTTP request succeeded", ['response' => $response->json()]);
+
+                return $response->json();
+            }, 1000);
+
+            Log::info("$context - Completed call successfully", ['cep' => $cep]);
+
+            return $result;
+        } catch (\Throwable $e) {
+            Log::error("$context - Exception caught after retries", [
+                'cep' => $cep,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
+
 }

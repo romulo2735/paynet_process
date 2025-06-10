@@ -17,19 +17,39 @@ class CpfIntegration
      */
     public function checkCpf(string $cpf): ?array
     {
-        Log::info("$this->LOG_CONTEXT - Starting call to cpf", ['$cpf' => $cpf]);
+        $context = "$this->LOG_CONTEXT - CpfStatusIntegration";
+        Log::info("$context - Starting call", ['cpf' => $cpf]);
 
-        return retry(3, function () use ($cpf) {
-            $response = Http::get("http://localhost:8080/api/mock/cpf/status/{$cpf}");
+        try {
+            $result = retry(3, function () use ($cpf, $context) {
+                Log::info("$context - Attempting HTTP request", ['cpf' => $cpf]);
 
-            if ($response->failed()) {
-                Log::error("$this->LOG_CONTEXT - error call to cpf", ['status' => $response->status()]);
-                throw new \Exception("Error validating CPF");
-            }
+                $response = Http::get("http://localhost:8080/api/mock/cpf/status/{$cpf}");
 
-            Log::info("$this->LOG_CONTEXT - completed successfully");
+                if ($response->failed()) {
+                    Log::error("$context - HTTP request failed", [
+                        'cpf' => $cpf,
+                        'status' => $response->status(),
+                        'body' => $response->body()
+                    ]);
+                    throw new \Exception("Error validating CPF");
+                }
 
-            return $response->json();
-        }, 1000);
+                Log::info("$context - HTTP request succeeded");
+
+                return $response->json();
+            }, 1000);
+
+            Log::info("$context - Completed call successfully");
+
+            return $result;
+        } catch (\Throwable $e) {
+            Log::error("$context - Exception caught after retries", [
+                'cpf' => $cpf,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
+
 }

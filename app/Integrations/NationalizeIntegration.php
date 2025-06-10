@@ -17,22 +17,42 @@ class NationalizeIntegration
      */
     public function checkName(string $email): ?array
     {
-        Log::info("$this->LOG_CONTEXT - Starting call to nationalize", ['email' => $email]);
+        $context = "$this->LOG_CONTEXT - NationalizeIntegration";
+        Log::info("$context - Starting call", ['email' => $email]);
 
         $name = explode('@', $email)[0];
         $firstName = preg_replace('/[^a-zA-Z]/', '', explode('.', $name)[0]);
 
-        return retry(3, function () use ($firstName) {
-            $response = Http::get("https://api.nationalize.io/?name={$firstName}");
+        try {
+            $result = retry(3, function () use ($firstName, $context) {
+                Log::info("$context - Attempting HTTP request", ['firstName' => $firstName]);
 
-            if ($response->failed()) {
-                Log::error("$this->LOG_CONTEXT - error call to nationalize", ['status' => $response->status()]);
-                throw new \Exception('Error searching for nationality');
-            }
+                $response = Http::get("https://api.nationalize.io/?name={$firstName}");
 
-            Log::info("$this->LOG_CONTEXT - completed successfully");
+                if ($response->failed()) {
+                    Log::error("$context - HTTP request failed", [
+                        'firstName' => $firstName,
+                        'status' => $response->status(),
+                        'body' => $response->body()
+                    ]);
+                    throw new \Exception('Error searching for nationality');
+                }
 
-            return $response->json();
-        }, 1000);
+                Log::info("$context - HTTP request succeeded");
+
+                return $response->json();
+            }, 1000);
+
+            Log::info("$context - Completed call successfully");
+
+            return $result;
+        } catch (\Throwable $e) {
+            Log::error("$context - Exception caught after retries", [
+                'firstName' => $firstName,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
+
 }
